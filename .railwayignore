@@ -1,0 +1,10 @@
+# Files to ignore during Railway deployment
+node_modules
+.git
+*.md
+dev.db
+.env.local
+.vscode
+.manus-logs
+references
+patches
