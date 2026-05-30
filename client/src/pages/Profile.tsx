@@ -34,14 +34,24 @@ export default function Profile() {
   const { mutate: parseResume, isPending: parsingResume } = trpc.profile.parseResume.useMutation({
     onSuccess: (data) => {
       console.log("Resume parsed successfully:", data);
+      console.log("Skills array:", data.skills);
+      console.log("Job titles array:", data.jobTitlePreferences);
+      
+      if (!data.skills || data.skills.length === 0) {
+        toast.warning("No skills found in resume. Please add them manually.");
+      }
+      if (!data.jobTitlePreferences || data.jobTitlePreferences.length === 0) {
+        toast.warning("No job titles found. Please add them manually.");
+      }
+      
       toast.success("Resume parsed successfully!");
       setFormData({
         resumeText: formData.resumeText,
-        skills: data.skills.join(", "),
-        jobTitlePreferences: data.jobTitlePreferences.join(", "),
+        skills: data.skills?.join(", ") || "",
+        jobTitlePreferences: data.jobTitlePreferences?.join(", ") || "",
         targetLocations: formData.targetLocations,
-        currentJobTitle: data.currentJobTitle,
-        yearsOfExperience: data.yearsOfExperience,
+        currentJobTitle: data.currentJobTitle || "",
+        yearsOfExperience: data.yearsOfExperience || 0,
       });
       refetch();
     },

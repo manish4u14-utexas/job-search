@@ -1,1 +1,13 @@
-{"version":"7","dialect":"sqlite","entries":[]}
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1780155283109,
+      "tag": "0000_silky_skrulls",
+      "breakpoints": true
+    }
+  ]
+}

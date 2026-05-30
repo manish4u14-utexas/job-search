@@ -1,305 +1,214 @@
-# 🚀 AI-Powered Job Search Dashboard
+# AI-Powered Job Search Dashboard
 
-A full-stack job search dashboard that helps you find, analyze, and apply to jobs with AI-powered matching and resume tailoring.
+An intelligent job search platform that helps you find, track, and apply to jobs with AI-powered resume tailoring and job matching.
 
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Node](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen.svg)
-![Python](https://img.shields.io/badge/python-3.11-blue.svg)
+## Features
 
-## ✨ Features
+- 🔍 **Real-time Job Search** - Fetch jobs from Indeed and ZipRecruiter using JobSpy
+- 🤖 **AI Resume Parsing** - Automatically extract skills and experience from your resume
+- 📝 **Smart Job Matching** - AI analyzes job descriptions and matches them to your profile
+- ✍️ **Resume Tailoring** - Generate customized resumes for each job application
+- 💌 **Cover Letter Generation** - AI-powered cover letters tailored to each position
+- 📊 **Application Tracking** - Track your applications and follow-ups
+- 🎯 **Recruiter Management** - Save and manage recruiter contacts
 
-### 🎯 **Smart Job Matching**
-- Real-time job fetching from Indeed and LinkedIn (via JobSpy)
-- AI-powered relevance scoring (0-100%)
-- Detailed match breakdown (skills, experience, location, title)
-- Visa sponsorship detection (critical for international candidates)
+## Tech Stack
 
-### 📝 **Resume Tailoring**
-- One-click AI resume customization per job
-- Highlights relevant skills and experience
-- Preserves original format
-- Copy to clipboard functionality
+- **Frontend**: React, TypeScript, Vite, TailwindCSS
+- **Backend**: Node.js, Express, tRPC
+- **Database**: SQLite with Drizzle ORM
+- **AI**: OpenAI GPT-4o / Groq Llama
+- **Job Scraping**: Python JobSpy
 
-### 📊 **Job Tracking**
-- Visual indicators for viewed/applied jobs
-- Persistent tracking across sessions
-- Statistics dashboard (viewed/applied counts)
-- Never apply to the same job twice
+## Prerequisites
 
-### ⚙️ **Multi-LLM Support**
-- Groq (free, 100K tokens/day)
-- OpenAI (GPT-4)
-- Anthropic (Claude)
-- Custom providers
-- Easy provider switching
+- Node.js 18+ and pnpm
+- Python 3.11+ (for JobSpy)
+- OpenAI or Groq API key
 
-### 🎨 **Modern UI**
-- Cyberpunk-themed design
-- Responsive layout
-- Real-time updates
-- Toast notifications
-- Error handling with helpful messages
+## Installation
 
-## 🛠️ Tech Stack
+### 1. Clone the repository
 
-### **Frontend**
-- React 19
-- TypeScript
-- Vite
-- TailwindCSS
-- tRPC (type-safe API)
-- Wouter (routing)
-
-### **Backend**
-- Node.js 20
-- Express
-- tRPC
-- SQLite (via @libsql/client)
-- Drizzle ORM
-
-### **Job Scraping**
-- Python 3.11
-- JobSpy (free, unlimited)
-
-### **AI/LLM**
-- OpenAI API
-- Groq API
-- Anthropic API
-
-## 📋 Prerequisites
-
-- Node.js 20+
-- Python 3.11
-- pnpm (package manager)
-- Groq API key (free at console.groq.com)
-- OpenAI API key (optional, backup)
-
-## 🚀 Quick Start
-
-### **1. Clone the Repository**
 ```bash
-git clone https://github.com/YOUR_USERNAME/job-search-dashboard.git
+git clone https://github.com/manish4u14-utexas/job-search.git
 cd job-search-dashboard
 ```
 
-### **2. Install Dependencies**
+### 2. Install Node.js dependencies
+
 ```bash
-# Install Node.js dependencies
 pnpm install
-
-# Install Python dependencies
-pip install jobspy
 ```
 
-### **3. Configure Environment**
+### 3. Install Python JobSpy
+
 ```bash
-# Copy example env file
-cp .env.example .env
-
-# Edit .env and add your API keys
-GROQ_API_KEY=your_groq_key_here
-OPENAI_API_KEY=your_openai_key_here
+python3.11 -m pip install python-jobspy
 ```
 
-### **4. Initialize Database**
+### 4. Set up environment variables
+
+Create a `.env` file:
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` and add your API keys:
+
+```env
+# Required: At least one LLM provider
+OPENAI_API_KEY=your_openai_key_here
+# OR
+GROQ_API_KEY=your_groq_key_here
+
+# Database (auto-created)
+DATABASE_URL=file:./dev.db
+
+NODE_ENV=development
+```
+
+### 5. Initialize the database
+
 ```bash
 pnpm run db:push
 ```
 
-### **5. Start Development Server**
+### 6. Start the development server
+
 ```bash
 pnpm run dev
 ```
 
-Visit `http://localhost:3000`
+The app will be available at `http://localhost:3000`
 
-## 📖 Usage Guide
+## Usage
 
-### **First Time Setup**
+### 1. Set up your profile
+
 1. Go to **Profile** page
-2. Upload your resume (PDF, DOCX, or TXT)
-3. Review auto-parsed information
-4. Add job titles you're looking for
-5. Add target locations
-6. Save profile
+2. Upload your resume (PDF or DOCX)
+3. Click **"AUTO-FILL FROM RESUME"** to extract your information
+4. Review and edit the extracted data
+5. Click **"SAVE PROFILE"**
 
-### **Daily Job Search**
-1. Select **Indeed** or **LinkedIn** tab
-2. Choose time filter (24h, 48h, 72h, 1 week)
-3. Choose jobs limit (5, 10, 15, 20, 25, 30)
-4. Click **REFRESH**
-5. Review jobs with AI match scores
-6. For high matches (80%+):
-   - Click **ANALYZE MATCH** for details
-   - Click **TAILOR RESUME** for customized resume
-   - Click **COPY TO CLIPBOARD**
-   - Click **APPLY NOW** to open job posting
+### 2. Configure LLM Settings
 
-### **Job Tracking**
-- 🟢 **Green border + "✓ APPLIED"** = Already applied
-- 🔵 **Cyan border + "👁 VIEWED"** = Already viewed
-- ⚪ **No border** = New job
+1. Go to **Settings** page
+2. Choose your LLM provider (OpenAI recommended for best results)
+3. Enter your API key
+4. Select the model (gpt-4o recommended)
+5. Click **"SAVE SETTINGS"**
 
-## 🌐 Deployment
+### 3. Search for jobs
 
-### **Deploy to Railway (Recommended)**
+1. Go to **Dashboard**
+2. Jobs will automatically load based on your profile
+3. Use filters to refine results (time range, number of jobs)
+4. Switch between Indeed and LinkedIn tabs
 
-1. **Push to GitHub**
-```bash
-git init
-git add .
-git commit -m "Initial commit"
-git remote add origin YOUR_GITHUB_REPO
-git push -u origin main
+### 4. Apply to jobs
+
+1. Click on a job card to see details
+2. Review the AI match score and analysis
+3. Click **"TAILOR RESUME"** to generate a customized resume
+4. Click **"GENERATE COVER LETTER"** for a personalized cover letter
+5. Track your application status
+
+## Project Structure
+
+```
+job-search-dashboard/
+├── client/              # React frontend
+│   └── src/
+│       ├── components/  # Reusable UI components
+│       ├── pages/       # Page components
+│       └── lib/         # Utilities and helpers
+├── server/              # Express backend
+│   ├── _core/          # Core server setup
+│   ├── routers.ts      # tRPC API routes
+│   ├── db.ts           # Database queries
+│   └── llm-services.ts # AI/LLM integrations
+├── scripts/            # Python scripts
+│   └── fetch-jobs.py   # JobSpy integration
+├── drizzle/            # Database schema and migrations
+└── shared/             # Shared types and utilities
 ```
 
-2. **Deploy on Railway**
-- Go to [railway.app](https://railway.app)
-- Click "Deploy from GitHub repo"
-- Select your repository
-- Add environment variables:
-  ```
-  NODE_ENV=production
-  GROQ_API_KEY=your_key
-  OPENAI_API_KEY=your_key
-  ```
+## Configuration
 
-3. **Add Custom Domain (Optional)**
-- Railway Dashboard → Settings → Domains
-- Add your custom domain
-- Configure DNS in your domain provider
+### LLM Providers
 
-**See [DEPLOY_NOW.md](DEPLOY_NOW.md) for detailed instructions.**
+The app supports multiple LLM providers:
 
-## 📚 Documentation
+- **OpenAI** (Recommended): Best for structured output and resume parsing
+  - Model: `gpt-4o` or `gpt-4o-mini`
+  - Get API key: https://platform.openai.com
 
-- **[DEPLOY_NOW.md](DEPLOY_NOW.md)** - Quick 5-minute deployment guide
-- **[DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md)** - Comprehensive deployment options
-- **[CUSTOM_DOMAIN_SETUP.md](CUSTOM_DOMAIN_SETUP.md)** - Custom domain configuration
-- **[DAILY_WORKFLOW.md](DAILY_WORKFLOW.md)** - Daily usage guide
-- **[JOB_TRACKING_FEATURE.md](JOB_TRACKING_FEATURE.md)** - Job tracking documentation
-- **[RAILWAY_PRICING_EXPLAINED.md](RAILWAY_PRICING_EXPLAINED.md)** - Pricing details
+- **Groq**: Faster and free tier available
+  - Model: `llama-3.3-70b-versatile`
+  - Get API key: https://console.groq.com
+  - Note: Use OpenAI for resume parsing (Groq has issues with structured JSON)
 
-## 🔑 API Keys
+### Job Search
 
-### **Groq (Recommended - Free)**
-1. Go to [console.groq.com](https://console.groq.com)
-2. Sign up (free)
-3. Create API key
-4. 100K tokens/day free tier
+JobSpy fetches real jobs from:
+- Indeed
+- ZipRecruiter
 
-### **OpenAI (Backup)**
-1. Go to [platform.openai.com](https://platform.openai.com)
-2. Sign up
-3. Create API key
-4. Pay-as-you-go pricing
-
-## 💰 Cost
-
-### **Development (Local)**
-- FREE (no hosting costs)
-
-### **Production (Railway)**
-- **Hosting:** FREE ($5 credit/month, app uses ~$2/month)
-- **Groq API:** FREE (100K tokens/day)
-- **OpenAI API:** Pay-as-you-go (optional)
-- **Total:** FREE for personal use
-
-## 🎯 Key Features Explained
-
-### **AI Job Matching**
-The AI analyzes your complete profile against each job:
-- Skills match (technical + soft skills)
-- Experience match (years + relevance)
-- Location match (remote, hybrid, on-site)
-- Title match (job titles you want)
-- Visa sponsorship detection
-
-### **Resume Tailoring**
-AI customizes your resume for each job:
-- Highlights relevant experience
-- Emphasizes matching skills
-- Preserves original format
-- Optimizes for ATS systems
-
-### **Job Tracking**
-Never apply twice:
-- Tracks viewed jobs
-- Tracks applied jobs
-- Persists across sessions
-- Works across sources (Indeed + LinkedIn)
-
-## 🔧 Configuration
-
-### **LLM Settings**
-Configure in Settings page:
-- Choose provider (Groq, OpenAI, Anthropic)
-- Add API keys
-- Test connection
-- Switch providers anytime
-
-### **Job Search Filters**
-- **Time:** 24h, 48h, 72h, 1 week
-- **Limit:** 5, 10, 15, 20, 25, 30 jobs
-- **Source:** Indeed, LinkedIn
-
-### **Profile Settings**
-- Resume upload
-- Skills list
-- Job title preferences
+Configure search parameters in your profile:
+- Job titles you're interested in
 - Target locations
 - Years of experience
 
-## 🐛 Troubleshooting
+## Development
 
-### **Rate Limit Errors**
-- Wait 30 minutes for Groq to reset
-- Switch to OpenAI in Settings
-- Reduce jobs limit (try 5 instead of 10)
+### Build for production
 
-### **No Jobs Found**
-- Check profile has job titles and locations
-- Try different time filter (48h or 72h)
-- Try different source (Indeed vs LinkedIn)
+```bash
+pnpm run build
+```
 
-### **Jobs Not Persisting**
-- Check if localStorage is enabled
-- Not using incognito mode
-- Clear cache and try again
+### Run production build
 
-## 🤝 Contributing
+```bash
+pnpm start
+```
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+### Database migrations
 
-## 📄 License
+```bash
+pnpm run db:push
+```
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+## Troubleshooting
 
-## 🙏 Acknowledgments
+### Resume parsing returns empty fields
 
-- [JobSpy](https://github.com/Bunsly/JobSpy) - Free job scraping
-- [Railway](https://railway.app) - Easy deployment
-- [Groq](https://groq.com) - Fast, free LLM API
-- [tRPC](https://trpc.io) - Type-safe APIs
+- Make sure you're using **OpenAI** as the LLM provider
+- Groq has issues with structured JSON output
+- Check that your API key is valid
 
-## 📞 Support
+### No jobs found
 
-For issues and questions:
-- Open an issue on GitHub
-- Check documentation in `/docs` folder
-- Review troubleshooting guides
+- Verify Python 3.11+ is installed: `python3.11 --version`
+- Check JobSpy is installed: `python3.11 -m pip list | grep jobspy`
+- Try broader search terms in your profile
 
-## 🎉 Features Roadmap
+### Database errors
 
-- [ ] Email notifications for new jobs
-- [ ] Application tracking dashboard
-- [ ] Cover letter generation
-- [ ] Interview preparation tips
-- [ ] Salary insights
-- [ ] Company research integration
+- Delete `dev.db` and run `pnpm run db:push` to recreate
+- Check file permissions on the database file
 
----
+## License
 
-**Built with ❤️ for job seekers**
+MIT
 
-**Good luck with your job search! 🚀**
+## Contributing
+
+Contributions are welcome! Please open an issue or submit a pull request.
+
+## Support
+
+For issues or questions, please open an issue on GitHub.

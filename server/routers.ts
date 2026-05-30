@@ -117,17 +117,22 @@ export const appRouter = router({
           const parsed = await parseResumeText(input.resumeText);
           console.log("Resume parsed successfully:", parsed);
           
+          // Ensure arrays are not undefined
+          const safeParsed = {
+            skills: Array.isArray(parsed.skills) ? parsed.skills : [],
+            jobTitlePreferences: Array.isArray(parsed.jobTitlePreferences) ? parsed.jobTitlePreferences : [],
+            yearsOfExperience: parsed.yearsOfExperience || 0,
+            currentJobTitle: parsed.currentJobTitle || "",
+          };
+          
           // Auto-update profile with parsed data
           await upsertUserProfile(userId, {
             resumeText: input.resumeText,
-            skills: parsed.skills,
-            jobTitlePreferences: parsed.jobTitlePreferences,
-            yearsOfExperience: parsed.yearsOfExperience,
-            currentJobTitle: parsed.currentJobTitle,
+            ...safeParsed,
           });
           console.log("Profile auto-updated with parsed data");
           
-          return parsed;
+          return safeParsed;
         } catch (error) {
           console.error("Error parsing resume:", error);
           throw new Error(
