@@ -536,7 +536,7 @@ export const appRouter = router({
           country = "USA";
           sites = ["indeed", "zip_recruiter"];
         } else if (region === "india") {
-          locations = ["Bangalore", "Mumbai", "Delhi", "Hyderabad", "Pune", "Chennai"];
+          locations = ["Bangalore", "Mumbai", "Delhi", "Hyderabad", "Pune", "Chennai", "Noida", "Gurgaon", "Gurugram", "Ahmedabad", "Kolkata", "Jaipur"];
           country = "India";
           sites = ["indeed"];
         } else if (region === "middle-east") {

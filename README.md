@@ -107,7 +107,7 @@ The app will be available at `http://localhost:3000`
 1. Go to **Dashboard**
 2. Choose your region tab:
    - **USA** - Jobs from Indeed + ZipRecruiter (Remote, New York, SF, Austin, etc.)
-   - **INDIA** - Jobs from Indeed India (Bangalore, Mumbai, Delhi, Hyderabad, Pune, Chennai)
+   - **INDIA** - Jobs from Indeed India (Bangalore, Mumbai, Delhi, Hyderabad, Pune, Chennai, Noida, Gurgaon, Ahmedabad, Kolkata, Jaipur)
    - **MIDDLE EAST** - Jobs from Bayt (Dubai, Abu Dhabi, Riyadh, Doha, Kuwait City)
 3. Jobs are automatically filtered to match your profile (40%+ match score)
 4. Click **REFRESH JOBS** to fetch the latest opportunities
@@ -165,7 +165,7 @@ JobSpy fetches real jobs from:
 
 **Regional Tabs:**
 - **USA Tab**: Searches Indeed (USA) + ZipRecruiter for locations like Remote, New York, San Francisco, Austin
-- **India Tab**: Searches Indeed India for locations like Bangalore, Mumbai, Delhi, Hyderabad, Pune, Chennai
+- **India Tab**: Searches Indeed India for locations like Bangalore, Mumbai, Delhi, Hyderabad, Pune, Chennai, Noida, Gurgaon, Ahmedabad, Kolkata, Jaipur
 - **Middle East Tab**: Searches Bayt for locations like Dubai, Abu Dhabi, Riyadh, Doha, Kuwait City
 
 The app automatically:

@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import {
@@ -14,6 +15,8 @@ import {
   Settings as SettingsIcon,
   User,
   List,
+  Globe,
+  MapPin,
 } from "lucide-react";
 
 export default function Dashboard() {
@@ -21,24 +24,21 @@ export default function Dashboard() {
   const [expandedJobId, setExpandedJobId] = useState<string | null>(null);
   const [analyzedJobs, setAnalyzedJobs] = useState<Map<string, any>>(new Map());
   const [tailoredResumes, setTailoredResumes] = useState<Map<string, string>>(new Map());
+  const [activeRegion, setActiveRegion] = useState<"usa" | "india" | "middle-east">("usa");
   const [activeSource, setActiveSource] = useState<"indeed" | "linkedin">("indeed");
   const [hoursFilter, setHoursFilter] = useState<number>(72);
   const [jobsLimit, setJobsLimit] = useState<number>(10);
   
-  // Cache for storing fetched jobs per source (persisted in localStorage)
+  // Cache for storing fetched jobs per region and source (persisted in localStorage)
   const [jobsCache, setJobsCache] = useState<{
-    indeed?: { jobs: any[]; fetchedAt: string; rateLimitHit?: boolean; message?: string };
-    linkedin?: { jobs: any[]; fetchedAt: string; rateLimitHit?: boolean; message?: string };
+    [key: string]: { jobs: any[]; fetchedAt: string; rateLimitHit?: boolean; message?: string };
   }>(() => {
     // Load cache from localStorage on mount
     try {
       const saved = localStorage.getItem('jobsCache');
       if (saved) {
         const parsed = JSON.parse(saved);
-        console.log('[Dashboard] Loaded cache from localStorage:', {
-          indeed: parsed.indeed?.jobs?.length || 0,
-          linkedin: parsed.linkedin?.jobs?.length || 0,
-        });
+        console.log('[Dashboard] Loaded cache from localStorage:', Object.keys(parsed).length, 'entries');
         return parsed;
       }
     } catch (error) {
@@ -76,6 +76,7 @@ export default function Dashboard() {
   const { data: jobData, isLoading, refetch, isRefetching, error: fetchError } = trpc.jobFeed.fetch.useQuery(
     {
       source: activeSource,
+      region: activeRegion,
       hoursOld: hoursFilter,
       limit: jobsLimit,
     },
@@ -88,6 +89,7 @@ export default function Dashboard() {
   useEffect(() => {
     if (jobData) {
       console.log('[Dashboard] Received jobData from backend:', {
+        region: activeRegion,
         source: activeSource,
         jobCount: jobData.jobs?.length,
         fetchedAt: jobData.fetchedAt,
@@ -107,10 +109,11 @@ export default function Dashboard() {
         });
       }
       
-      console.log('[Dashboard] Updating cache for source:', activeSource);
+      console.log('[Dashboard] Updating cache for region+source:', `${activeRegion}-${activeSource}`);
+      const cacheKey = `${activeRegion}-${activeSource}`;
       const newCache = {
         ...jobsCache,
-        [activeSource]: {
+        [cacheKey]: {
           jobs: jobData.jobs || [],
           fetchedAt: jobData.fetchedAt,
           rateLimitHit: jobData.rateLimitHit,
@@ -127,7 +130,7 @@ export default function Dashboard() {
         console.error('[Dashboard] Error saving cache to localStorage:', error);
       }
     }
-  }, [jobData, activeSource]);
+  }, [jobData, activeRegion, activeSource]);
   
   // Persist viewed jobs to localStorage
   useEffect(() => {
@@ -182,8 +185,9 @@ export default function Dashboard() {
     }
   }, [fetchError]);
 
-  // Get jobs from cache for current source
-  const cachedData = jobsCache[activeSource];
+  // Get jobs from cache for current region + source
+  const cacheKey = `${activeRegion}-${activeSource}`;
+  const cachedData = jobsCache[cacheKey];
   const jobs = cachedData?.jobs || [];
   const fetchedAt = cachedData?.fetchedAt;
   const rateLimitHit = cachedData?.rateLimitHit || false;
@@ -191,7 +195,9 @@ export default function Dashboard() {
 
   // Debug logging
   console.log('[Dashboard] Current state:', {
+    activeRegion,
     activeSource,
+    cacheKey,
     jobCount: jobs.length,
     rateLimitHit,
     message,
@@ -212,9 +218,23 @@ export default function Dashboard() {
     });
   };
 
+  // Handle region change
+  const handleRegionChange = (region: "usa" | "india" | "middle-east") => {
+    setActiveRegion(region);
+  };
+
   // Handle source change
   const handleSourceChange = (source: "indeed" | "linkedin") => {
     setActiveSource(source);
+  };
+
+  // Get job counts per region (combining both sources)
+  const getRegionJobCount = (region: string) => {
+    const indeedKey = `${region}-indeed`;
+    const linkedinKey = `${region}-linkedin`;
+    const indeedCount = jobsCache[indeedKey]?.jobs?.length || 0;
+    const linkedinCount = jobsCache[linkedinKey]?.jobs?.length || 0;
+    return indeedCount + linkedinCount;
   };
 
   // Handle time filter change
@@ -360,7 +380,7 @@ export default function Dashboard() {
                 JOB FEED
               </h1>
               <p style={{ color: "var(--neon-cyan)", marginBottom: "0.5rem" }}>
-                {jobs?.length || 0} jobs found matching your profile
+                {jobs?.length || 0} jobs found matching your profile in {activeRegion.toUpperCase().replace('-', ' ')}
                 {viewedJobs.size > 0 && (
                   <span style={{ marginLeft: "1rem", color: "#9ca3af", fontSize: "0.875rem" }}>
                     • {viewedJobs.size} viewed • {appliedJobs.size} applied
@@ -483,7 +503,7 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Source Tabs and Time Filter */}
+          {/* Region Tabs and Time Filter */}
           <div
             style={{
               display: "flex",
@@ -493,12 +513,77 @@ export default function Dashboard() {
               gap: "1rem",
             }}
           >
-            {/* Source Tabs */}
+            {/* Region Tabs */}
             <div style={{ display: "flex", gap: "0.5rem" }}>
+              <button
+                onClick={() => handleRegionChange("usa")}
+                style={{
+                  padding: "0.5rem 1.5rem",
+                  backgroundColor: activeRegion === "usa" ? "var(--neon-cyan)" : "transparent",
+                  color: activeRegion === "usa" ? "#000" : "var(--neon-cyan)",
+                  border: `2px solid var(--neon-cyan)`,
+                  borderRadius: "0.25rem",
+                  fontWeight: "bold",
+                  cursor: "pointer",
+                  transition: "all 0.3s",
+                  textTransform: "uppercase",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                }}
+              >
+                <Globe style={{ width: "1rem", height: "1rem" }} />
+                USA ({getRegionJobCount('usa')})
+              </button>
+              <button
+                onClick={() => handleRegionChange("india")}
+                style={{
+                  padding: "0.5rem 1.5rem",
+                  backgroundColor: activeRegion === "india" ? "var(--neon-pink)" : "transparent",
+                  color: activeRegion === "india" ? "#000" : "var(--neon-pink)",
+                  border: `2px solid var(--neon-pink)`,
+                  borderRadius: "0.25rem",
+                  fontWeight: "bold",
+                  cursor: "pointer",
+                  transition: "all 0.3s",
+                  textTransform: "uppercase",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                }}
+              >
+                <MapPin style={{ width: "1rem", height: "1rem" }} />
+                INDIA ({getRegionJobCount('india')})
+              </button>
+              <button
+                onClick={() => handleRegionChange("middle-east")}
+                style={{
+                  padding: "0.5rem 1.5rem",
+                  backgroundColor: activeRegion === "middle-east" ? "var(--neon-green)" : "transparent",
+                  color: activeRegion === "middle-east" ? "#000" : "var(--neon-green)",
+                  border: `2px solid var(--neon-green)`,
+                  borderRadius: "0.25rem",
+                  fontWeight: "bold",
+                  cursor: "pointer",
+                  transition: "all 0.3s",
+                  textTransform: "uppercase",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                }}
+              >
+                <Globe style={{ width: "1rem", height: "1rem" }} />
+                MIDDLE EAST ({getRegionJobCount('middle-east')})
+              </button>
+            </div>
+
+            {/* Source Toggle (Indeed/LinkedIn) */}
+            <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+              <span style={{ color: "#9ca3af", fontSize: "0.875rem", marginRight: "0.5rem" }}>SOURCE:</span>
               <button
                 onClick={() => handleSourceChange("indeed")}
                 style={{
-                  padding: "0.5rem 1.5rem",
+                  padding: "0.5rem 1rem",
                   backgroundColor: activeSource === "indeed" ? "var(--neon-cyan)" : "transparent",
                   color: activeSource === "indeed" ? "#000" : "var(--neon-cyan)",
                   border: `2px solid var(--neon-cyan)`,
@@ -507,6 +592,7 @@ export default function Dashboard() {
                   cursor: "pointer",
                   transition: "all 0.3s",
                   textTransform: "uppercase",
+                  fontSize: "0.875rem",
                 }}
               >
                 INDEED
@@ -514,18 +600,19 @@ export default function Dashboard() {
               <button
                 onClick={() => handleSourceChange("linkedin")}
                 style={{
-                  padding: "0.5rem 1.5rem",
-                  backgroundColor: activeSource === "linkedin" ? "var(--neon-pink)" : "transparent",
-                  color: activeSource === "linkedin" ? "#000" : "var(--neon-pink)",
-                  border: `2px solid var(--neon-pink)`,
+                  padding: "0.5rem 1rem",
+                  backgroundColor: activeSource === "linkedin" ? "var(--neon-purple)" : "transparent",
+                  color: activeSource === "linkedin" ? "#000" : "var(--neon-purple)",
+                  border: `2px solid var(--neon-purple)`,
                   borderRadius: "0.25rem",
                   fontWeight: "bold",
                   cursor: "pointer",
                   transition: "all 0.3s",
                   textTransform: "uppercase",
+                  fontSize: "0.875rem",
                 }}
               >
-                LINKEDIN (FREE)
+                LINKEDIN
               </button>
             </div>
 
