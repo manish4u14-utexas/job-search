@@ -4,7 +4,7 @@ An intelligent job search platform that helps you find, track, and apply to jobs
 
 ## Features
 
-- 🔍 **Real-time Job Search** - Fetch jobs from Indeed and ZipRecruiter using JobSpy
+- 🔍 **Real-time Job Search** - Fetch jobs from Indeed (USA, India, UK, Canada) and ZipRecruiter using JobSpy
 - 🤖 **AI Resume Parsing** - Automatically extract skills and experience from your resume
 - 📝 **Smart Job Matching** - AI analyzes job descriptions and matches them to your profile
 - ✍️ **Resume Tailoring** - Generate customized resumes for each job application
@@ -154,8 +154,13 @@ The app supports multiple LLM providers:
 ### Job Search
 
 JobSpy fetches real jobs from:
-- Indeed
-- ZipRecruiter
+- **Indeed** - Supports multiple countries (USA, India, UK, Canada, etc.)
+- **ZipRecruiter** - US jobs
+
+The app automatically detects the country based on your target locations:
+- India locations (Bangalore, Mumbai, Delhi, etc.) → searches Indeed India
+- UK locations (London, etc.) → searches Indeed UK
+- US locations → searches Indeed USA + ZipRecruiter
 
 Configure search parameters in your profile:
 - Job titles you're interested in

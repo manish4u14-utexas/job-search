@@ -18,7 +18,7 @@ def is_valid_value(value):
         return False
     return True
 
-def fetch_with_jobspy(search_term, location, results_wanted, hours_old, sites=None):
+def fetch_with_jobspy(search_term, location, results_wanted, hours_old, sites=None, country='USA'):
     """Fetch jobs using JobSpy library"""
     try:
         from jobspy import scrape_jobs
@@ -26,7 +26,7 @@ def fetch_with_jobspy(search_term, location, results_wanted, hours_old, sites=No
         if sites is None:
             sites = ["indeed", "zip_recruiter"]
         
-        print(f"[JobSpy] Searching for: {search_term} in {location} from {sites}", file=sys.stderr)
+        print(f"[JobSpy] Searching for: {search_term} in {location} from {sites} (country: {country})", file=sys.stderr)
         
         jobs_df = scrape_jobs(
             site_name=sites,
@@ -34,7 +34,7 @@ def fetch_with_jobspy(search_term, location, results_wanted, hours_old, sites=No
             location=location,
             results_wanted=results_wanted,
             hours_old=hours_old,
-            country_indeed='USA'
+            country_indeed=country  # Support India, USA, UK, etc.
         )
         
         if jobs_df is None or len(jobs_df) == 0:
@@ -128,7 +128,7 @@ def fetch_with_jobspy(search_term, location, results_wanted, hours_old, sites=No
 
 def main():
     if len(sys.argv) < 3:
-        print(json.dumps({"error": "Usage: fetch-jobs.py <search_term> <location> [results_wanted] [hours_old] [sites]"}))
+        print(json.dumps({"error": "Usage: fetch-jobs.py <search_term> <location> [results_wanted] [hours_old] [sites] [country]"}))
         sys.exit(1)
     
     search_term = sys.argv[1]
@@ -136,12 +136,13 @@ def main():
     results_wanted = int(sys.argv[3]) if len(sys.argv) > 3 else 50
     hours_old = int(sys.argv[4]) if len(sys.argv) > 4 else 48
     sites_arg = sys.argv[5] if len(sys.argv) > 5 else None
+    country = sys.argv[6] if len(sys.argv) > 6 else 'USA'  # Default to USA
     
     sites = None
     if sites_arg:
         sites = [s.strip() for s in sites_arg.split(',')]
     
-    jobs = fetch_with_jobspy(search_term, location, results_wanted, hours_old, sites)
+    jobs = fetch_with_jobspy(search_term, location, results_wanted, hours_old, sites, country)
     print(json.dumps(jobs))
 
 if __name__ == "__main__":

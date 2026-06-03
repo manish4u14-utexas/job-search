@@ -27,17 +27,20 @@ export interface FetchedJob {
   currency?: string;
 }
 
-/**
- * Fetch jobs in real-time based on user profile
- */
-export async function fetchJobsRealTime(profile: {
+export interface JobSearchParams {
   jobTitles: string[];
   locations: string[];
   experienceLevel?: string;
   resultsWanted?: number;
   hoursOld?: number;
   sites?: string[]; // Optional: specify which sites to scrape
-}): Promise<FetchedJob[]> {
+  country?: string; // Optional: specify country for Indeed (USA, India, UK, etc.)
+}
+
+/**
+ * Fetch jobs in real-time based on user profile
+ */
+export async function fetchJobsRealTime(profile: JobSearchParams): Promise<FetchedJob[]> {
   try {
     // Combine job titles with OR
     const searchTerm = profile.jobTitles.join(" OR ");
@@ -45,6 +48,7 @@ export async function fetchJobsRealTime(profile: {
     const resultsWanted = profile.resultsWanted || 50;
     const hoursOld = profile.hoursOld || 48;
     const sites = profile.sites || ["indeed", "zip_recruiter"]; // Default sites
+    const country = profile.country || "USA"; // Default to USA (can be: USA, India, UK, Canada, etc.)
 
     console.log(`[JobFetcher] Fetching jobs:`, {
       searchTerm,
@@ -52,6 +56,7 @@ export async function fetchJobsRealTime(profile: {
       resultsWanted,
       hoursOld,
       sites,
+      country,
     });
 
     // Call Python script - use different path for production vs development
@@ -61,7 +66,7 @@ export async function fetchJobsRealTime(profile: {
     
     const scriptPath = join(process.cwd(), "scripts", "fetch-jobs.py");
     const sitesArg = sites.join(",");
-    const command = `${pythonPath} "${scriptPath}" "${searchTerm}" "${location}" ${resultsWanted} ${hoursOld} "${sitesArg}"`;
+    const command = `${pythonPath} "${scriptPath}" "${searchTerm}" "${location}" ${resultsWanted} ${hoursOld} "${sitesArg}" "${country}"`;
 
     console.log(`[JobFetcher] Executing: ${command}`);
 
@@ -156,10 +161,30 @@ export async function fetchJobsForProfile(
   console.log("[JobFetcher] Using job titles:", jobTitles);
   console.log("[JobFetcher] Using locations:", locations);
 
+  // Auto-detect country based on locations
+  let country = "USA"; // Default
+  const locationStr = locations.join(" ").toLowerCase();
+  
+  if (locationStr.includes("india") || locationStr.includes("bangalore") || 
+      locationStr.includes("mumbai") || locationStr.includes("delhi") || 
+      locationStr.includes("hyderabad") || locationStr.includes("pune") || 
+      locationStr.includes("chennai") || locationStr.includes("kolkata")) {
+    country = "India";
+  } else if (locationStr.includes("uk") || locationStr.includes("united kingdom") || 
+             locationStr.includes("london")) {
+    country = "UK";
+  } else if (locationStr.includes("canada") || locationStr.includes("toronto") || 
+             locationStr.includes("vancouver")) {
+    country = "Canada";
+  }
+
+  console.log("[JobFetcher] Detected country:", country);
+
   return fetchJobsRealTime({
     jobTitles,
     locations,
     resultsWanted: 30,  // Reduced for faster AI analysis
     hoursOld: 72,
+    country,  // Pass detected country
   });
 }

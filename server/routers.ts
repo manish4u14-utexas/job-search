@@ -507,6 +507,7 @@ export const appRouter = router({
     fetch: publicProcedure
       .input(z.object({
         source: z.enum(["indeed", "linkedin"]).default("indeed"),
+        region: z.enum(["usa", "india", "middle-east", "all"]).default("all"),
         hoursOld: z.number().default(72),
         limit: z.number().default(10),
       }).optional())
@@ -519,10 +520,53 @@ export const appRouter = router({
         }
         
         const source = input?.source || "indeed";
+        const region = input?.region || "all";
         const hoursOld = input?.hoursOld || 72;
         const limit = input?.limit || 10;
         
-        console.log(`[JobFeed] Fetching ${source} jobs (last ${hoursOld} hours, limit: ${limit})...`);
+        console.log(`[JobFeed] Fetching ${source} jobs from ${region} (last ${hoursOld} hours, limit: ${limit})...`);
+        
+        // Determine locations and country based on region
+        let locations: string[];
+        let country: string;
+        let sites: string[];
+        
+        if (region === "usa") {
+          locations = ["Remote", "United States", "New York", "San Francisco", "Austin"];
+          country = "USA";
+          sites = ["indeed", "zip_recruiter"];
+        } else if (region === "india") {
+          locations = ["Bangalore", "Mumbai", "Delhi", "Hyderabad", "Pune", "Chennai"];
+          country = "India";
+          sites = ["indeed"];
+        } else if (region === "middle-east") {
+          locations = ["Dubai", "Abu Dhabi", "Riyadh", "Doha", "Kuwait City"];
+          country = "UAE";
+          sites = ["bayt"];
+        } else {
+          // "all" - use profile preferences
+          const jobTitles = Array.isArray(profile.jobTitlePreferences) 
+            ? profile.jobTitlePreferences 
+            : ["Product Manager"];
+          locations = Array.isArray(profile.targetLocations) && profile.targetLocations.length > 0
+            ? profile.targetLocations
+            : ["Remote", "United States"];
+          
+          // Auto-detect country from profile locations
+          const locationStr = locations.join(" ").toLowerCase();
+          if (locationStr.includes("india") || locationStr.includes("bangalore") || 
+              locationStr.includes("mumbai") || locationStr.includes("delhi")) {
+            country = "India";
+            sites = ["indeed"];
+          } else if (locationStr.includes("dubai") || locationStr.includes("uae") || 
+                     locationStr.includes("middle east")) {
+            country = "UAE";
+            sites = ["bayt"];
+          } else {
+            country = "USA";
+            sites = ["indeed", "zip_recruiter"];
+          }
+        }
         
         let allJobs: any[] = [];
         
@@ -542,6 +586,7 @@ export const appRouter = router({
             resultsWanted: limit,
             hoursOld,
             sites: ["linkedin"], // Use JobSpy to scrape LinkedIn directly
+            country,
           });
         } else {
           // Indeed via JobSpy
@@ -549,15 +594,14 @@ export const appRouter = router({
           const jobTitles = Array.isArray(profile.jobTitlePreferences) 
             ? profile.jobTitlePreferences 
             : ["Product Manager"];
-          const locations = Array.isArray(profile.targetLocations) && profile.targetLocations.length > 0
-            ? profile.targetLocations
-            : ["Remote", "United States"];
           
           allJobs = await fetchJobsRealTime({
             jobTitles,
             locations,
             resultsWanted: limit,
             hoursOld,
+            sites,
+            country,
           });
         }
         
