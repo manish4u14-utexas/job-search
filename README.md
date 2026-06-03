@@ -5,8 +5,9 @@ An intelligent job search platform that helps you find, track, and apply to jobs
 ## Features
 
 - 🔍 **Real-time Job Search** - Fetch jobs from Indeed (USA, India, UK, Canada) and ZipRecruiter using JobSpy
+- 🌍 **Regional Job Tabs** - Separate tabs for USA, India, and Middle East jobs with automatic profile matching
 - 🤖 **AI Resume Parsing** - Automatically extract skills and experience from your resume
-- 📝 **Smart Job Matching** - AI analyzes job descriptions and matches them to your profile
+- 📝 **Smart Job Matching** - AI analyzes job descriptions and matches them to your profile (40%+ match threshold)
 - ✍️ **Resume Tailoring** - Generate customized resumes for each job application
 - 💌 **Cover Letter Generation** - AI-powered cover letters tailored to each position
 - 📊 **Application Tracking** - Track your applications and follow-ups
@@ -104,9 +105,13 @@ The app will be available at `http://localhost:3000`
 ### 3. Search for jobs
 
 1. Go to **Dashboard**
-2. Jobs will automatically load based on your profile
-3. Use filters to refine results (time range, number of jobs)
-4. Switch between Indeed and LinkedIn tabs
+2. Choose your region tab:
+   - **USA** - Jobs from Indeed + ZipRecruiter (Remote, New York, SF, Austin, etc.)
+   - **INDIA** - Jobs from Indeed India (Bangalore, Mumbai, Delhi, Hyderabad, Pune, Chennai)
+   - **MIDDLE EAST** - Jobs from Bayt (Dubai, Abu Dhabi, Riyadh, Doha, Kuwait City)
+3. Jobs are automatically filtered to match your profile (40%+ match score)
+4. Click **REFRESH JOBS** to fetch the latest opportunities
+5. Each tab shows only jobs matching your profile skills and preferences
 
 ### 4. Apply to jobs
 
@@ -156,11 +161,18 @@ The app supports multiple LLM providers:
 JobSpy fetches real jobs from:
 - **Indeed** - Supports multiple countries (USA, India, UK, Canada, etc.)
 - **ZipRecruiter** - US jobs
+- **Bayt** - Middle East jobs (UAE, Saudi Arabia, Qatar, Kuwait)
 
-The app automatically detects the country based on your target locations:
-- India locations (Bangalore, Mumbai, Delhi, etc.) → searches Indeed India
-- UK locations (London, etc.) → searches Indeed UK
-- US locations → searches Indeed USA + ZipRecruiter
+**Regional Tabs:**
+- **USA Tab**: Searches Indeed (USA) + ZipRecruiter for locations like Remote, New York, San Francisco, Austin
+- **India Tab**: Searches Indeed India for locations like Bangalore, Mumbai, Delhi, Hyderabad, Pune, Chennai
+- **Middle East Tab**: Searches Bayt for locations like Dubai, Abu Dhabi, Riyadh, Doha, Kuwait City
+
+The app automatically:
+1. Fetches jobs from the selected region
+2. Analyzes each job against your profile using AI
+3. Shows only jobs with 40%+ match score
+4. Displays match reasoning for each job
 
 Configure search parameters in your profile:
 - Job titles you're interested in
