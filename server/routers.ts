@@ -532,7 +532,7 @@ export const appRouter = router({
         let sites: string[];
         
         if (region === "usa") {
-          locations = ["Remote", "United States", "New York", "San Francisco", "Austin"];
+          locations = ["Remote", "United States", "Raleigh", "Durham", "Morrisville", "Charlotte", "New York", "San Francisco", "Austin"];
           country = "USA";
           sites = ["indeed", "zip_recruiter"];
         } else if (region === "india") {
@@ -570,19 +570,18 @@ export const appRouter = router({
         
         let allJobs: any[] = [];
         
+        // Get job titles from profile
+        const jobTitles = Array.isArray(profile.jobTitlePreferences) 
+          ? profile.jobTitlePreferences 
+          : ["Product Manager"];
+        
         if (source === "linkedin") {
           // LinkedIn via JobSpy (free, no API key needed!)
           const { fetchJobsRealTime } = await import("./job-fetcher");
-          const jobTitles = Array.isArray(profile.jobTitlePreferences) 
-            ? profile.jobTitlePreferences 
-            : ["Product Manager"];
-          const locations = Array.isArray(profile.targetLocations) && profile.targetLocations.length > 0
-            ? profile.targetLocations
-            : ["Remote", "United States"];
           
           allJobs = await fetchJobsRealTime({
             jobTitles,
-            locations,
+            locations, // Use region-specific locations, not profile locations
             resultsWanted: limit,
             hoursOld,
             sites: ["linkedin"], // Use JobSpy to scrape LinkedIn directly
@@ -591,13 +590,10 @@ export const appRouter = router({
         } else {
           // Indeed via JobSpy
           const { fetchJobsRealTime } = await import("./job-fetcher");
-          const jobTitles = Array.isArray(profile.jobTitlePreferences) 
-            ? profile.jobTitlePreferences 
-            : ["Product Manager"];
           
           allJobs = await fetchJobsRealTime({
             jobTitles,
-            locations,
+            locations, // Use region-specific locations
             resultsWanted: limit,
             hoursOld,
             sites,
